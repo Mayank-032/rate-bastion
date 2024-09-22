@@ -21,26 +21,21 @@ func (s *slidingWindow) IsRequestAllowed(userId string) bool {
 		userRequestsTimestamps[userId] = make([]time.Time, 0)
 	}
 
-	newRequestTimestamp := time.Now()                            // current time
-	initialRequestTimestamp := userRequestsTimestamps[userId][0] // first request of the user
-	timeDiff := newRequestTimestamp.Sub(initialRequestTimestamp).Seconds()
+	newRequestTimestamp := time.Now()          // current time
+	requests := userRequestsTimestamps[userId] // first request of the user
 
-	// if the time difference is greater than the time window, remove all the initial request timestamps whose time difference is greater than the time window
-	if timeDiff > float64(s.TimeWindowInSeconds) {
-		for len(userRequestsTimestamps[userId]) > 0 && timeDiff > float64(s.TimeWindowInSeconds) {
-			initialRequestTimestamp = userRequestsTimestamps[userId][0]
-			timeDiff = newRequestTimestamp.Sub(initialRequestTimestamp).Seconds()
-			if timeDiff > float64(s.TimeWindowInSeconds) {
-				userRequestsTimestamps[userId] = userRequestsTimestamps[userId][1:]
-			}
-		}
-	} else {
-		// if the time difference is less than the time window, check if the number of requests is greater than the max requests in the time window
-		if len(userRequestsTimestamps[userId]) >= s.MaxRequestsInTimeWindow {
-			return false
-		}
+	// remove outdated request timestamps
+	cutOffTime := newRequestTimestamp.Add(-time.Duration(s.TimeWindowInSeconds) * time.Second)
+	for len(requests) > 0 && requests[0].Before(cutOffTime) { // timestamps before cutoff time are outdated
+		requests = requests[1:]
 	}
 
-	userRequestsTimestamps[userId] = append(userRequestsTimestamps[userId], newRequestTimestamp)
+	// if the number of requests is greater than the max requests in the time window, return false
+	if len(requests) >= s.MaxRequestsInTimeWindow {
+		return false
+	}
+
+	// add the new request timestamp
+	userRequestsTimestamps[userId] = append(requests, newRequestTimestamp)
 	return true
 }
