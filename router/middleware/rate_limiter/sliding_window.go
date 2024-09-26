@@ -1,10 +1,14 @@
 package ratelimiter
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type slidingWindow struct {
 	MaxRequestsInTimeWindow int
 	TimeWindowInSeconds     int
+	mu                      sync.Mutex
 }
 
 var userRequestsTimestamps = make(map[string][]time.Time, 0)
@@ -25,6 +29,9 @@ func (s *slidingWindow) IsRequestAllowed(userId string) bool {
 	requests := userRequestsTimestamps[userId] // first request of the user
 
 	// remove outdated request timestamps
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	cutOffTime := newRequestTimestamp.Add(-time.Duration(s.TimeWindowInSeconds) * time.Second)
 	for len(requests) > 0 && requests[0].Before(cutOffTime) { // timestamps before cutoff time are outdated
 		requests = requests[1:]
