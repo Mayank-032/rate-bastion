@@ -13,7 +13,7 @@ type slidingWindow struct {
 
 var userRequestsTimestamps = make(map[string][]time.Time, 0)
 
-func NewSlidingWindowRateLimiter(maxRequestsInTimeWindow int, timeWindowInSeconds int) RateLimiter {
+func newSlidingWindowRateLimiter(maxRequestsInTimeWindow int, timeWindowInSeconds int) RateLimiter {
 	return &slidingWindow{
 		MaxRequestsInTimeWindow: maxRequestsInTimeWindow,
 		TimeWindowInSeconds:     timeWindowInSeconds,

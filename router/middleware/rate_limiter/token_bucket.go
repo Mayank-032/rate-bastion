@@ -15,7 +15,7 @@ type tokenBucket struct {
 
 var userBuckets = make(map[string]*tokenBucket, 0)
 
-func NewTokenBucketRateLimiter(maxRequestsInTimeWindow int, timeWindowInSeconds int) RateLimiter {
+func newTokenBucketRateLimiter(maxRequestsInTimeWindow int, timeWindowInSeconds int) RateLimiter {
 	return &tokenBucket{
 		MaxRequestsInTimeWindow: maxRequestsInTimeWindow,
 		TimeWindowInSeconds:     timeWindowInSeconds,

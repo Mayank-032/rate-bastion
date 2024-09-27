@@ -25,9 +25,10 @@ func ParseHeader(next http.Handler) http.Handler {
 			return
 		}
 
-		// check if user id is in the rate limiter and if the request is allowed
 		// get rate limiter instance from factory
 		rateLimiter := ratelimiter.NewRateLimiter("sliding_window", 1, 2)
+
+		// check if user id is in the rate limiter and if the request is allowed
 		if !rateLimiter.IsRequestAllowed(userId) {
 			http.Error(w, "Too many requests", http.StatusTooManyRequests)
 			return
