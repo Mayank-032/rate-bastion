@@ -2,10 +2,11 @@ package router
 
 import (
 	"net/http"
+	"rate-limiter/cache"
 	"rate-limiter/router/middleware"
 )
 
-func InitRouter() *http.ServeMux {
+func InitRouter(cacheInstance cache.Cache) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	successHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
