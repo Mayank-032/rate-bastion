@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+var CacheInstance Cache
+
 func NewCache(cacheType string) Cache {
 	switch cacheType {
 	case "redis":
@@ -14,10 +16,13 @@ func NewCache(cacheType string) Cache {
 			log.Println("error while string to int conversion: ", err.Error())
 			return nil
 		}
-		return newRedisCache(configs.Configuration.Redis.Host, configs.Configuration.Redis.Port, db)
+
+		CacheInstance = newRedisCache(configs.Configuration.Redis.Host, configs.Configuration.Redis.Port, db)
 	case "memcache":
-		return newMemCache(configs.Configuration.Redis.Host, configs.Configuration.Redis.Port, configs.Configuration.Redis.Database)
+		CacheInstance = newMemCache(configs.Configuration.Memcache.Host, configs.Configuration.Memcache.Port, configs.Configuration.Memcache.Database)
 	default:
 		return nil
 	}
+
+	return CacheInstance
 }

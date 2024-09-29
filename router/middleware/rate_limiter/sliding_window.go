@@ -1,6 +1,10 @@
 package ratelimiter
 
 import (
+	"encoding/json"
+	"log"
+	"rate-limiter/cache"
+	"strings"
 	"sync"
 	"time"
 )
@@ -8,10 +12,7 @@ import (
 type slidingWindow struct {
 	MaxRequestsInTimeWindow int
 	TimeWindowInSeconds     int
-	mu                      sync.Mutex
 }
-
-var userRequestsTimestamps = make(map[string][]time.Time, 0)
 
 func newSlidingWindowRateLimiter(maxRequestsInTimeWindow int, timeWindowInSeconds int) RateLimiter {
 	return &slidingWindow{
@@ -20,29 +21,63 @@ func newSlidingWindowRateLimiter(maxRequestsInTimeWindow int, timeWindowInSecond
 	}
 }
 
-func (s *slidingWindow) IsRequestAllowed(userId string) bool {
-	if _, ok := userRequestsTimestamps[userId]; !ok {
-		userRequestsTimestamps[userId] = make([]time.Time, 0)
+type userTimestamps struct {
+	Timestamps []time.Time `json:"timestamps"`
+}
+
+func (s *slidingWindow) IsRequestAllowed(userId string) (bool, error) {
+	var cacheInstance = cache.CacheInstance
+	var user = userTimestamps{}
+
+	userObj, err := cacheInstance.Get(userId)
+	if err != nil {
+		log.Printf("err: %v; unable to get user instance from cache\n", err.Error())
+
+		if !strings.EqualFold(err.Error(), "invalid key") {
+			return false, err
+		}
+
+		user = userTimestamps{Timestamps: make([]time.Time, 0)}
+	} else {
+		err = json.Unmarshal([]byte(userObj), &user)
+		if err != nil {
+			log.Printf("err: %v, unable to unmarshal bytes to user struct\n", err.Error())
+			return false, err
+		}
 	}
 
-	newRequestTimestamp := time.Now()          // current time
-	requests := userRequestsTimestamps[userId] // first request of the user
+	var newRequestTimestamp = time.Now() // current time
+	var requests = user.Timestamps       // first request of the user
+
+	var mu sync.Mutex
+	mu.Lock()
+	defer mu.Unlock()
 
 	// remove outdated request timestamps
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	cutOffTime := newRequestTimestamp.Add(-time.Duration(s.TimeWindowInSeconds) * time.Second)
+	var cutOffTime = newRequestTimestamp.Add(-time.Duration(s.TimeWindowInSeconds) * time.Second)
 	for len(requests) > 0 && requests[0].Before(cutOffTime) { // timestamps before cutoff time are outdated
 		requests = requests[1:]
 	}
 
 	// if the number of requests is greater than the max requests in the time window, return false
 	if len(requests) >= s.MaxRequestsInTimeWindow {
-		return false
+		userBytes, err := json.Marshal(user)
+		if err != nil {
+			log.Printf("err: %v, unable to marshal struct\n", err.Error())
+			return false, err
+		}
+		cacheInstance.Set(userId, string(userBytes))
+		return false, nil
 	}
 
 	// add the new request timestamp
-	userRequestsTimestamps[userId] = append(requests, newRequestTimestamp)
-	return true
+	user.Timestamps = append(requests, newRequestTimestamp)
+	userBytes, err := json.Marshal(user)
+	if err != nil {
+		log.Printf("err: %v, unable to marshal struct\n", err.Error())
+		return false, err
+	}
+	cacheInstance.Set(userId, string(userBytes))
+
+	return true, nil
 }
