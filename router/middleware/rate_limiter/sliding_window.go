@@ -66,7 +66,11 @@ func (s *slidingWindow) IsRequestAllowed(userId string) (bool, error) {
 			log.Printf("err: %v, unable to marshal struct\n", err.Error())
 			return false, err
 		}
-		cacheInstance.Set(userId, string(userBytes))
+		err = cacheInstance.Set(userId, string(userBytes))
+		if err != nil {
+			log.Printf("err: %v, unable to set key-value pair", err.Error())
+			return false, err
+		}
 		return false, nil
 	}
 
@@ -77,7 +81,11 @@ func (s *slidingWindow) IsRequestAllowed(userId string) (bool, error) {
 		log.Printf("err: %v, unable to marshal struct\n", err.Error())
 		return false, err
 	}
-	cacheInstance.Set(userId, string(userBytes))
+	err = cacheInstance.Set(userId, string(userBytes))
+	if err != nil {
+		log.Printf("err: %v, unable to set key-value pair", err.Error())
+		return false, err
+	}
 
 	return true, nil
 }

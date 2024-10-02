@@ -28,11 +28,9 @@ func main() {
 	// setup router (pass cache instance while initialising so that our cache will be used along with setting up the router)
 	server := router.InitRouter()
 
-	port := 8000
-	if err := http.ListenAndServe(fmt.Sprintf(":%v", port), server); err != nil {
+	log.Println("starting server on port:", configs.Configuration.Port)
+	if err := http.ListenAndServe(fmt.Sprintf(":%v", configs.Configuration.Port), server); err != nil {
 		log.Println("unable to start server on port: ", err.Error())
 		return
 	}
-
-	log.Println("starting server on port: ", port)
 }

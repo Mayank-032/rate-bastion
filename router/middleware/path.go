@@ -19,14 +19,14 @@ func ParseMethod(method string, next http.Handler) http.Handler {
 func ParseHeader(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// fetch user id from header
-		userId := r.Header.Get("X-User-ID")
+		userId := r.Header.Get("X-User-Id")
 		if userId == "" {
 			http.Error(w, "User ID is required", http.StatusBadRequest)
 			return
 		}
 
 		// get rate limiter instance from factory
-		rateLimiter := ratelimiter.NewRateLimiter("sliding_window", 1, 2)
+		rateLimiter := ratelimiter.NewRateLimiter("token_bucket", 2, 10)
 
 		// check if user id is in the rate limiter and if the request is allowed
 		ok, err := rateLimiter.IsRequestAllowed(userId)

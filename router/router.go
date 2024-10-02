@@ -16,7 +16,7 @@ func InitRouter() *http.ServeMux {
 	mux.Handle("/limited", middleware.ParseMethod("GET", middleware.ParseHeader(successHandler)))
 
 	// endpoint without rate limiting middleware
-	mux.Handle("/limited-sliding-window", middleware.ParseMethod("GET", successHandler))
+	mux.Handle("/unlimited", middleware.ParseMethod("GET", successHandler))
 
 	return mux
 }

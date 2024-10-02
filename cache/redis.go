@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -14,49 +15,77 @@ type redisCache struct {
 }
 
 func newRedisCache(host, port string, db int) Cache {
+	ctx := context.Background()
+	client := redis.NewClient(&redis.Options{
+		Addr: fmt.Sprintf("%s:%s", host, port),
+		DB:   db,
+	})
+
+	res, err := client.Ping(ctx).Result()
+	if err != nil {
+		return nil
+	}
+	log.Printf("PING-%v\n", res)
+
 	return &redisCache{
-		Client: redis.NewClient(&redis.Options{
-			Addr: fmt.Sprintf("%s:%s", host, port),
-			DB:   db,
-		}),
+		ctx:    ctx,
+		Client: client,
 	}
 }
 
 func (r *redisCache) Get(key string) (string, error) {
-	redisObj := r.Client.Get(r.ctx, "")
-	if redisObj == nil {
-		return "", errors.New("invalid key")
+	if r.Client == nil {
+		return "", errors.New("redis client is not initialized")
 	}
 
-	if redisObj.Err() != nil {
-		return "", redisObj.Err()
+	value, err := r.Client.Get(r.ctx, key).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return "", errors.New("invalid key")
+		}
+		if err == redis.ErrClosed {
+			return "", errors.New("connection closed")
+		}
+		return "", err
 	}
 
-	return redisObj.Val(), nil
+	return value, nil
 }
 
 func (r *redisCache) Set(key string, value interface{}) error {
-	redisObj := r.Client.Set(r.ctx, key, value, 0)
-	if redisObj == nil {
-		return errors.New("invalid key")
+	if r.Client == nil {
+		return errors.New("redis client is not initialized")
 	}
 
-	if redisObj.Err() != nil {
-		return redisObj.Err()
+	res, err := r.Client.Set(r.ctx, key, value, 0).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return errors.New("invalid key")
+		}
+		if err == redis.ErrClosed {
+			return errors.New("connection closed")
+		}
+
+		return err
 	}
+	log.Printf("user: %v, res: %v", key, res)
 
 	return nil
 }
 
 func (r *redisCache) Delete(key string) error {
-	redisObj := r.Client.Del(r.ctx, key)
-	if redisObj == nil {
-		return errors.New("invalid key")
+	if r.Client == nil {
+		return errors.New("redis client is not initialized")
 	}
 
-	if redisObj.Err() != nil {
-		return redisObj.Err()
+	res, err := r.Client.Del(r.ctx, key).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return errors.New("invalid key")
+		}
+		return err
 	}
+	log.Println("res: ", res)
 
 	return nil
 }
