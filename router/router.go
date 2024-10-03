@@ -2,7 +2,7 @@ package router
 
 import (
 	"net/http"
-	"rate-limiter/router/middleware"
+	"rateBastion/router/middleware"
 )
 
 func InitRouter() *http.ServeMux {

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"rate-limiter/cache"
-	"rate-limiter/configs"
-	"rate-limiter/router"
+	"rateBastion/cache"
+	"rateBastion/configs"
+	"rateBastion/router"
 )
 
 func main() {

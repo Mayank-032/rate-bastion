@@ -2,7 +2,7 @@ package cache
 
 import (
 	"log"
-	"rate-limiter/configs"
+	"rateBastion/configs"
 	"strconv"
 )
 

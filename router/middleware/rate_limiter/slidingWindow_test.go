@@ -3,7 +3,7 @@ package ratelimiter
 import (
 	"encoding/json"
 	"errors"
-	"rate-limiter/cache"
+	"rateBastion/cache"
 	"testing"
 	"time"
 

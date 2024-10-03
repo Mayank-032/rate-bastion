@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"net/http"
-	ratelimiter "rate-limiter/router/middleware/rate_limiter"
+	ratelimiter "rateBastion/router/middleware/rate_limiter"
 	"strings"
 )
 

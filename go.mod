@@ -1,4 +1,4 @@
-module rate-limiter
+module rateBastion
 
 go 1.22.5
 
