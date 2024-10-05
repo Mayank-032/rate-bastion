@@ -11,11 +11,11 @@ type memCache struct {
 	Client *memcache.Client
 }
 
-func newMemCache(host, port, _ string) Cache {
+func newMemCache(host, port, _ string) (Cache, error) {
 	servers := []string{fmt.Sprintf("%v:%v", host, port)}
 	return &memCache{
 		Client: memcache.New(servers...),
-	}
+	}, nil
 }
 
 func (m *memCache) Get(key string) (string, error) {

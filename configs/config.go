@@ -13,9 +13,10 @@ type store struct {
 }
 
 type config struct {
-	Port     string `json:"port"`
-	Redis    store  `json:"store"`
-	Memcache store  `json:"memcache"`
+	Environment string `json:"environment"`
+	Port        string `json:"port"`
+	Redis       store  `json:"store"`
+	Memcache    store  `json:"memcache"`
 }
 
 var Configuration config

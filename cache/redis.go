@@ -14,7 +14,7 @@ type redisCache struct {
 	Client *redis.Client
 }
 
-func newRedisCache(host, port string, db int) Cache {
+func newRedisCache(host, port string, db int) (Cache, error) {
 	ctx := context.Background()
 	client := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%s", host, port),
@@ -23,14 +23,14 @@ func newRedisCache(host, port string, db int) Cache {
 
 	res, err := client.Ping(ctx).Result()
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	log.Printf("PING-%v\n", res)
 
 	return &redisCache{
 		ctx:    ctx,
 		Client: client,
-	}
+	}, nil
 }
 
 func (r *redisCache) Get(key string) (string, error) {
