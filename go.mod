@@ -1,4 +1,4 @@
-module rateBastion
+module github.com/Mayank-032/rateBastion
 
 go 1.22.5
 

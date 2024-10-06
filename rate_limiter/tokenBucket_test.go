@@ -3,9 +3,10 @@ package ratelimiter
 import (
 	"encoding/json"
 	"errors"
-	"rateBastion/cache"
 	"testing"
 	"time"
+
+	"github.com/Mayank-032/rateBastion/cache"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

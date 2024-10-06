@@ -2,8 +2,9 @@ package cache
 
 import (
 	"log"
-	"rateBastion/enums"
 	"strconv"
+
+	"github.com/Mayank-032/rateBastion/enums"
 )
 
 var CacheInstance Cache

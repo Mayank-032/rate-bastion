@@ -3,8 +3,9 @@ package ratelimiter
 import (
 	"errors"
 	"log"
-	"rateBastion/cache"
-	"rateBastion/configs"
+
+	"github.com/Mayank-032/rateBastion/cache"
+	"github.com/Mayank-032/rateBastion/configs"
 )
 
 func NewRateLimiter(config *configs.Config) (RateLimiter, error) {

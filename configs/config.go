@@ -1,6 +1,6 @@
 package configs
 
-import "rateBastion/enums"
+import "github.com/Mayank-032/rateBastion/enums"
 
 type store struct {
 	Host     string `json:"host"`

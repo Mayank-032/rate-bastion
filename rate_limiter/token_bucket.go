@@ -3,10 +3,11 @@ package ratelimiter
 import (
 	"encoding/json"
 	"log"
-	"rateBastion/cache"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/Mayank-032/rateBastion/cache"
 )
 
 type tokenBucket struct {
