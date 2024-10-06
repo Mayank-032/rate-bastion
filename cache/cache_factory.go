@@ -2,59 +2,34 @@ package cache
 
 import (
 	"log"
-	"os"
-	"rateBastion/configs"
+	"rateBastion/enums"
 	"strconv"
 )
 
 var CacheInstance Cache
 
-func NewCache(cacheType string) Cache {
+func NewCache(cacheType enums.CacheType, host, port, database string) (Cache, error) {
 	switch cacheType {
-	case "redis":
-		db, err := strconv.Atoi(configs.Configuration.Redis.Database)
+	case 1:
+		db, err := strconv.Atoi(database)
 		if err != nil {
 			log.Println("error while string to int conversion: ", err.Error())
-			return nil
+			return nil, err
 		}
 
-		var redisHost string
-		var redisPort string
-		switch configs.Configuration.Environment {
-		case "local":
-			redisHost = configs.Configuration.Redis.Host
-			redisPort = configs.Configuration.Redis.Port
-		default:
-			redisHost = os.Getenv("REDIS_HOST")
-			redisPort = os.Getenv("REDIS_PORT")
-		}
-
-		CacheInstance, err = newRedisCache(redisHost, redisPort, db)
+		CacheInstance, err = newRedisCache(host, port, db)
 		if err != nil {
-			log.Printf("err: %v, unable to init redis instance", err.Error())
-			return nil
+			return nil, err
 		}
-	case "memcache":
-		var memcacheHost string
-		var memcachePort string
-		switch configs.Configuration.Environment {
-		case "local":
-			memcacheHost = configs.Configuration.Memcache.Host
-			memcachePort = configs.Configuration.Memcache.Port
-		default:
-			memcacheHost = os.Getenv("MEMCACHE_HOST")
-			memcachePort = os.Getenv("MEMCACHE_PORT")
-		}
-
+	case 2:
 		var err error
-		CacheInstance, err = newMemCache(memcacheHost, memcachePort, configs.Configuration.Memcache.Database)
+		CacheInstance, err = newMemCache(host, port, database)
 		if err != nil {
-			log.Printf("err: %v, unable to init memcache instance", err.Error())
-			return nil
+			return nil, err
 		}
 	default:
-		return nil
+		return nil, nil
 	}
 
-	return CacheInstance
+	return CacheInstance, nil
 }
