@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Mayank-032/rateBastion/cache"
+	"github.com/Mayank-032/rate-bastion/cache"
 )
 
 type slidingWindow struct {

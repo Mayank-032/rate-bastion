@@ -4,8 +4,8 @@ import (
 	"errors"
 	"log"
 
-	"github.com/Mayank-032/rateBastion/cache"
-	"github.com/Mayank-032/rateBastion/configs"
+	"github.com/Mayank-032/rate-bastion/cache"
+	"github.com/Mayank-032/rate-bastion/configs"
 )
 
 func NewRateLimiter(config *configs.Config) (RateLimiter, error) {

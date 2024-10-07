@@ -4,7 +4,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/Mayank-032/rateBastion/enums"
+	"github.com/Mayank-032/rate-bastion/enums"
 )
 
 var CacheInstance Cache

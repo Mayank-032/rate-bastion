@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Mayank-032/rateBastion/cache"
+	"github.com/Mayank-032/rate-bastion/cache"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
