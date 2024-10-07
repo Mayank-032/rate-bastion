@@ -15,7 +15,7 @@ type slidingWindow struct {
 	TimeWindowInSeconds     int
 }
 
-func newSlidingWindowRateLimiter(maxRequestsInTimeWindow int, timeWindowInSeconds int) RateLimiter {
+func NewSlidingWindowRateLimiter(maxRequestsInTimeWindow int, timeWindowInSeconds int) LimitingMethod {
 	return &slidingWindow{
 		MaxRequestsInTimeWindow: maxRequestsInTimeWindow,
 		TimeWindowInSeconds:     timeWindowInSeconds,

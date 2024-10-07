@@ -1,5 +1,5 @@
 package ratelimiter
 
-type RateLimiter interface {
+type LimitingMethod interface {
 	IsRequestAllowed(userId string) (bool, error)
 }

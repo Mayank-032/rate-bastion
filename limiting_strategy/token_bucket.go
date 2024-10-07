@@ -15,7 +15,7 @@ type tokenBucket struct {
 	TimeWindowInSeconds     int // time after which the token bucket is refilled
 }
 
-func newTokenBucketRateLimiter(maxRequestsInTimeWindow int, timeWindowInSeconds int) RateLimiter {
+func NewTokenBucketRateLimiter(maxRequestsInTimeWindow int, timeWindowInSeconds int) LimitingMethod {
 	return &tokenBucket{
 		MaxRequestsInTimeWindow: maxRequestsInTimeWindow,
 		TimeWindowInSeconds:     timeWindowInSeconds,

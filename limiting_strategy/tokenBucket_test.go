@@ -16,7 +16,7 @@ func TestIsRequestAllowed_TokenBucket(t *testing.T) {
 	mockCache := new(cache.MockCache)
 	cache.CacheInstance = mockCache
 
-	rateLimiter := newTokenBucketRateLimiter(1, 2) // 1 request allowed in 2 seconds
+	rateLimiter := NewTokenBucketRateLimiter(1, 2) // 1 request allowed in 2 seconds
 
 	// Case-1: fail
 	t.Run("Redis GetUser failure", func(t *testing.T) {

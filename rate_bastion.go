@@ -1,4 +1,4 @@
-package ratelimiter
+package rateBastion
 
 import (
 	"errors"
@@ -6,9 +6,10 @@ import (
 
 	"github.com/Mayank-032/rate-bastion/cache"
 	"github.com/Mayank-032/rate-bastion/configs"
+	rateLimiterStrategy "github.com/Mayank-032/rate-bastion/limiting_strategy"
 )
 
-func NewRateLimiter(config *configs.Config) (RateLimiter, error) {
+func NewRateLimiter(config *configs.Config) (rateLimiterStrategy.LimitingMethod, error) {
 	// initialise cache for the rate limiter
 	cacheInstance, err := cache.NewCache(config.CacheType, config.CacheStore.Host, config.CacheStore.Port, config.CacheStore.Database)
 	if err != nil {
@@ -22,15 +23,15 @@ func NewRateLimiter(config *configs.Config) (RateLimiter, error) {
 	}
 
 	// initialise rate limiter with instance
-	var rateLimiter RateLimiter
+	var rateLimiterInstance rateLimiterStrategy.LimitingMethod
 	switch config.Strategy {
 	case 1: // TOKEN_BUCKET
-		rateLimiter = newTokenBucketRateLimiter(config.MaxRequestsAllowedInTimeWindow, config.TimeWindowInSeconds)
+		rateLimiterInstance = rateLimiterStrategy.NewTokenBucketRateLimiter(config.MaxRequestsAllowedInTimeWindow, config.TimeWindowInSeconds)
 	case 2: // SLIDING_WINDOW_LOG
-		rateLimiter = newSlidingWindowRateLimiter(config.MaxRequestsAllowedInTimeWindow, config.TimeWindowInSeconds)
+		rateLimiterInstance = rateLimiterStrategy.NewSlidingWindowRateLimiter(config.MaxRequestsAllowedInTimeWindow, config.TimeWindowInSeconds)
 	default:
 		return nil, errors.New("unknown rate limiter strategy")
 	}
 
-	return rateLimiter, nil
+	return rateLimiterInstance, nil
 }
